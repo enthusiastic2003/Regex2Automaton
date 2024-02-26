@@ -98,7 +98,7 @@ class ETree:
     def operatorStar(self, fsaX):
         pass
 
-    # a, b, c
+    # a, b, c and e for epsilon
     def alphabet(self, symbol):
         pass
 
@@ -119,6 +119,9 @@ class ETree:
         # write code to populate the above datastructures for a regex tree
 
         self.nfa = NFA(numStates, initialState, finalStates, transitions)
+
+        # print NFA
+
         return self.nfa
 
     ######################################################################
