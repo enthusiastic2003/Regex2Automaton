@@ -2,28 +2,27 @@ import abc
 
 # this class characterizes an automaton
 class FSA:
-    def __init__ (self, numStates = 0, startState=None, finalStates=None, alphabetTransitions=None) :
+    def __init__ (self, numStates = 0, startStates=None, finalStates=None, alphabetTransitions=None) :
         self.numStates = numStates
-        self.startState = startState
+        self.startStates = startStates
         self.finalStates = finalStates
         self.alphabetTransitions = alphabetTransitions
 
 class NFA(FSA):
     def simulate(self, ipStr):
-        S = set(self.startState)
+        S = set(self.startStates)
         newS = set()
         for i in range(len(ipStr)):
             symbol = ipStr[i]
-            while len(S) > 0:
-                tm = self.alphabetTransitions[symbol]
-                for state in range(len(S)):
-                    trs = tm[state]
-                    for tr in range(len(trs)):
-                        if trs[tr] == 1:
-                            newS.add(tr)
+            tm = self.alphabetTransitions[symbol]
+            for state in S:
+                trs = tm[state]
+                for tr in range(len(trs)):
+                    if trs[tr] == 1:
+                        newS.add(tr)
             S = set(newS)
             newS = set()
-        if S.intersection(self.finalStates):
+        if len(self.finalStates) > 0 and not S.isdisjoint(self.finalStates):
             print("String Accepted")
             return True
         else:
