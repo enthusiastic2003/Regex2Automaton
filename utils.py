@@ -88,14 +88,6 @@ class ETree:
     def resolveTransitionStates(self,treeL,treeR):
         treeLDict=treeL.alphabetTransitions
         treeRDict=treeR.alphabetTransitions
-        
-        print(treeL.startStates)
-        print(treeR.startStates)
-        print(treeR.finalStates)
-        print(treeL.finalStates)
-
-        print("LTransitions:",treeL.alphabetTransitions)
-        print("RTransitions:",treeR.alphabetTransitions)
         newDict={'a':[],'b':[],'c':[],'e':[]}
         for sym in newDict:
             for rowi in range(len(treeLDict[sym])+len(treeRDict[sym])):
@@ -131,12 +123,6 @@ class ETree:
         treeRStart,treeRFinal=treeR.startStates,treeR.finalStates
         
         tempFSA=self.resolveTransitionStates(treeL,treeR)
-        print("DOT BEGIN----------------")
-        print(tempFSA.startStates)
-        print(tempFSA.finalStates)
-
-        print("TempTransitions:",tempFSA.alphabetTransitions)
-        print("DOT END------------------")
         # print("treeLStart:",treeLStart)
         # print("treeLFinal:",treeLFinal)
         # print("treeRStart:",treeRStart)
@@ -174,23 +160,43 @@ class ETree:
 
 
     # *
-    # def operatorStar(self):
-    #     for sym in self.nfa.alphabetTransitions:
-    #         for row in self.nfa.alphabetTransitions[sym]:
-    #             row.append(0)
-    #         self.nfa.alphabetTransitions[sym].append([0 for i in range(self.nfa.numStates+1)])
+    def operatorStar(self,treeLeft):
+        # for sym in treeLeft.alphabetTransitions:
+        #     for row in treeLeft.alphabetTransitions[sym]:
+        #         row.append(0)
+        #     treeLeft.alphabetTransitions[sym].append([0 for i in range(treeLeft.numStates+1)])
+        preFinal=[]
+        # postStart=[]
+
+        # for state in treeLeft.startStates:
+        #     for sym in treeLeft.alphabetTransitions:
+        #         for coli in range(len(treeLeft.alphabetTransitions[sym])):
+        #             if(treeLeft.alphabetTransitions[sym][state][coli]==1):
+        #                 postStart.append((sym,coli))
         
-    #     for state in self.nfa.finalStates:
-    #         self.nfa.alphabetTransitions['e'][state][self.nfa.numStates]=1
+        for state in treeLeft.finalStates:
+            for sym in treeLeft.alphabetTransitions:
+                for rowi,row in enumerate(treeLeft.alphabetTransitions[sym]):
+                    if(row[state]==1):
+                        preFinal.append((sym,rowi))
+
         
-    #     for state in self.nfa.startStates:
-    #         self.nfa.alphabetTransitions['e'][self.nfa.numStates][state]=1
+        # newStart=treeLeft.numStates
+        # for target in postStart:
+        #     treeLeft.alphabetTransitions[target[0]][newStart][target[1]]=1
+
+        for stStates in treeLeft.startStates:
+            for target in preFinal:
+                treeLeft.alphabetTransitions[target[0]][target[1]][stStates]=1
+
+        treeLeft.finalStates=treeLeft.startStates.copy()       
         
-    #     self.nfa.finalStates.add(self.nfa.numStates)
-    #     self.nfa.startStates=set()
-    #     self.nfa.startStates.add(self.nfa.numStates)
-    #     self.nfa.numStates+=1
-    #     return (self.nfa.startStates.copy(),self.nfa.finalStates.copy())
+        # treeLeft.startStates=set()
+        # treeLeft.finalStates=set()
+        # treeLeft.startStates.add(treeLeft.numStates)
+        # treeLeft.finalStates.add(treeLeft.numStates)
+        # treeLeft.numStates+=1     
+        return treeLeft
 
             
     # a, b, c and e for epsilon
@@ -229,9 +235,8 @@ class ETree:
             treeLeft=None
             treeRight=None
             if symb=='*':
-                #treeLeft=self.recursor(root.left)
-                #retval=self.operatorStar(treeLeft)
-                pass
+                treeLeft=self.buildNFA(root.left)
+                retval=self.operatorStar(treeLeft)
             else:
                 treeLeft=self.buildNFA(root.left)
                 treeRight=self.buildNFA(root.right)

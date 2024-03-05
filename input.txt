@@ -1,7 +1,7 @@
 3
 (a*)
 1
-aeeeeeeeaeeeeeeeaeeeeeeeaeeeeeeeaeeeeeeeaeeeeeeeaeeeeeeea
+aaaaaaaa
 (b*)
 1
 bbbbbbbb

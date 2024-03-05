@@ -1,7 +1,7 @@
 import utils as ut
 import unittest
 
-"""class TestMembership(unittest.TestCase):
+class TestMembership(unittest.TestCase):
 
     def test_stringMembership(self):
         with open("input.txt", "r") as inputFile:
@@ -33,20 +33,20 @@ import unittest
 
         inputFile.close()
         expOutput.close()
-"""
+
 # __main__ module is invoked when the script is invoked at the commandline
 if __name__ == "__main__":
-    #unittest.main()
-    expTree=ut.ETree()
-    expTree.parseRegex(regex='c.((a.c).c)')
-    expTreeRoot=expTree.getTree()
+    unittest.main()
+    # expTree=ut.ETree()
+    # expTree.parseRegex(regex='c*.a')
+    # expTreeRoot=expTree.getTree()
 
-    nfaObj=expTree.buildNFA(expTreeRoot)
-    print(nfaObj.alphabetTransitions)
-    print("final States: ",nfaObj.finalStates)
-    print("start States: ",nfaObj.startStates)
-    print("numStates: ",nfaObj.numStates)
-    nfaObj.simulate("cacc")
+    # nfaObj=expTree.buildNFA(expTreeRoot)
+    # print(nfaObj.alphabetTransitions)
+    # print("final States: ",nfaObj.finalStates)
+    # print("start States: ",nfaObj.startStates)
+    # print("numStates: ",nfaObj.numStates)
+    # nfaObj.simulate("cac")
 
 
 
