@@ -86,6 +86,15 @@ class ETree:
     # to your need.
     ###################################################################
     def resolveTransitionStates(self,treeL,treeR):
+        """
+        The purpose of this function is to resolve the transition states of the two trees. That is to say,
+        When we are given 2 NFAs treeL, treeR, we merge the transition matrices of the two trees to form a new transition matrix.
+        This is done by adding treeL.numStates to the states of treeR, so the statenumbers of treeR do not overlap with treeL, they are 
+        shifted by treeL.numStates.
+
+        Also, we set the startStates as the union of the startStates of treeL and treeR.
+        And, we set the finalStates as the union of the finalStates of treeL and treeR.
+        """
         treeLDict=treeL.alphabetTransitions
         treeRDict=treeR.alphabetTransitions
         newDict={'a':[],'b':[],'c':[],'e':[]}
@@ -115,58 +124,43 @@ class ETree:
 
     # .
     def operatorDot(self, treeL,treeR):
-        # print("Transitions:",self.nfa.alphabetTransitions,"\n")
-        # print("Final: ", self.nfa.finalStates,"\n")
-        # print("Start: ", self.nfa.startStates,"\n")
+        """
+        Here, we basically make an epsilon-transition from the final states of treeL to the start states of treeR and then
+        we remove the epsilon transition from the final states of treeL to the start states of treeR using the algorithm to remove epsilon transitions.
+        """
+        treeLStart,treeLFinal=treeL.startStates,treeL.finalStates #start and final states of treeL
+        treeRStart,treeRFinal=treeR.startStates,treeR.finalStates #start and final states of treeR
+        
+        tempFSA=self.resolveTransitionStates(treeL,treeR) #resolve the transition states of the two trees
 
-        treeLStart,treeLFinal=treeL.startStates,treeL.finalStates
-        treeRStart,treeRFinal=treeR.startStates,treeR.finalStates
-        
-        tempFSA=self.resolveTransitionStates(treeL,treeR)
-        # print("treeLStart:",treeLStart)
-        # print("treeLFinal:",treeLFinal)
-        # print("treeRStart:",treeRStart)
-        # print("treeRFinal:",treeRFinal)
-        
-        markedStates=[]
+        markedStates=[] #Mark the states that are connected from the start states of treeR to the some other state of treeR
 
-        for LFinState in treeLFinal:
-            for sym in tempFSA.alphabetTransitions:
-                for rowi,row in enumerate(tempFSA.alphabetTransitions[sym]):
-                    if(row[LFinState]==1):
-                        markedStates.append((sym,rowi))
+        for state in treeRStart:
+            for sym in treeR.alphabetTransitions:
+                for coli in range(len(treeR.alphabetTransitions[sym])):
+                    if(treeR.alphabetTransitions[sym][state][coli]==1):#Check if the there is a transition from any one of the final states of treeR to some other state of treeR
+                        markedStates.append((sym,coli)) #Add the marked states and the symbol that marks them to the markedStates list
         
+        for symb,state in markedStates:
+            for finals in treeLFinal:
+                tempFSA.alphabetTransitions[symb][finals][state+treeL.numStates]=1
         
-        for preFinalStates in markedStates:
-            for rightStartStates in treeRStart:
-                tempFSA.alphabetTransitions[preFinalStates[0]][preFinalStates[1]][rightStartStates+treeL.numStates]=1
-        tempFSA.startStates=treeLStart
-        
-        newFinalStates=set()
-        for states in treeRFinal:
-            newFinalStates.add(states+treeL.numStates)
-        
+        tempFSA.startStates=treeLStart.copy()
+
         tempFSA.finalStates=set()
-        tempFSA.startStates=set()
+        for state in treeRFinal:
+            tempFSA.finalStates.add(state+treeL.numStates)
+
+        for state in treeLStart:
+            if state in treeLFinal:
+                for starts in treeRStart:
+                    tempFSA.startStates.add(starts+treeL.numStates)
         
-        #If the left fsa accepts e, then the final state of left-fsa must also be a accpting state of the final fsa
-        for states in treeLFinal:
-            if states in treeLStart:
-                newFinalStates.add(states)
-                for syms in tempFSA.alphabetTransitions:
-                    for coli in range(len(tempFSA.alphabetTransitions[syms][states])):
-
-                        if(tempFSA.alphabetTransitions[syms][states][coli]==1) and ((coli-treeL.numStates) in treeRStart):
-                            tempFSA.startStates.add(coli)
-
-        
-        #If the left fsa accepts e, then we must add the start states of right-fsa to the start states.
-        
-
-
-        tempFSA.finalStates=tempFSA.finalStates.union(newFinalStates)
-        tempFSA.startStates=tempFSA.startStates.union(treeLStart)
-
+        for state in treeRFinal:
+            if state in treeRStart:
+                for finals in treeLFinal:
+                    tempFSA.finalStates.add(finals)
+                    
         return tempFSA
 
     # +
