@@ -36,17 +36,18 @@ class TestMembership(unittest.TestCase):
 
 # __main__ module is invoked when the script is invoked at the commandline
 if __name__ == "__main__":
-    unittest.main()
-    # expTree=ut.ETree()
-    # expTree.parseRegex(regex='c*.a')
-    # expTreeRoot=expTree.getTree()
+    #unittest.main()
+    expTree=ut.ETree()
+    expTree.parseRegex('((b*).(a*))')
+    expTreeRoot=expTree.getTree()
 
-    # nfaObj=expTree.buildNFA(expTreeRoot)
-    # print(nfaObj.alphabetTransitions)
-    # print("final States: ",nfaObj.finalStates)
-    # print("start States: ",nfaObj.startStates)
-    # print("numStates: ",nfaObj.numStates)
-    # nfaObj.simulate("cac")
+    nfaObj=expTree.buildNFA(expTreeRoot)
+    print(nfaObj.alphabetTransitions)
+    print("final States: ",nfaObj.finalStates)
+    print("start States: ",nfaObj.startStates)
+    print("numStates: ",nfaObj.numStates)
+    print(nfaObj.simulate('ab'))
+    
 
 
 

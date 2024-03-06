@@ -1,4 +1,4 @@
-3
+4
 (a*)
 1
 aaaaaaaa
@@ -9,3 +9,7 @@ bbbbbbbb
 2
 a
 b
+(a+e)*
+2
+a
+aaaa

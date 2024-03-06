@@ -145,9 +145,27 @@ class ETree:
         newFinalStates=set()
         for states in treeRFinal:
             newFinalStates.add(states+treeL.numStates)
+        
+        tempFSA.finalStates=set()
+        tempFSA.startStates=set()
+        
+        #If the left fsa accepts e, then the final state of left-fsa must also be a accpting state of the final fsa
+        for states in treeLFinal:
+            if states in treeLStart:
+                newFinalStates.add(states)
+                for syms in tempFSA.alphabetTransitions:
+                    for coli in range(len(tempFSA.alphabetTransitions[syms][states])):
 
-        tempFSA.finalStates=newFinalStates
-        tempFSA.startStates=treeLStart
+                        if(tempFSA.alphabetTransitions[syms][states][coli]==1) and ((coli-treeL.numStates) in treeRStart):
+                            tempFSA.startStates.add(coli)
+
+        
+        #If the left fsa accepts e, then we must add the start states of right-fsa to the start states.
+        
+
+
+        tempFSA.finalStates=tempFSA.finalStates.union(newFinalStates)
+        tempFSA.startStates=tempFSA.startStates.union(treeLStart)
 
         return tempFSA
 
@@ -201,16 +219,28 @@ class ETree:
             
     # a, b, c and e for epsilon
     def alphabet(self, symbol):
-        newStartState=set()
-        newFinalState=set()
-        newNumStates=0
-        newStartState.add(newNumStates)
-        newFinalState.add(newNumStates+1)
-        newTransitions={'a':[[0,0],[0,0]],'b':[[0,0],[0,0]],'c':[[0,0],[0,0]],'e':[[0,0],[0,0]]}
-        newTransitions[symbol][newNumStates][newNumStates+1]=1
-        newNumStates+=2
-        newFSA=FSA(newNumStates,newStartState,newFinalState,newTransitions)
-        return newFSA
+        if(symbol!='e'):
+            newStartState=set()
+            newFinalState=set()
+            newNumStates=0
+            newStartState.add(newNumStates)
+            newFinalState.add(newNumStates+1)
+            newTransitions={'a':[[0,0],[0,0]],'b':[[0,0],[0,0]],'c':[[0,0],[0,0]],'e':[[0,0],[0,0]]}
+            newTransitions[symbol][newNumStates][newNumStates+1]=1
+            newNumStates+=2
+            newFSA=FSA(newNumStates,newStartState,newFinalState,newTransitions)
+            return newFSA
+        else:
+            newStartState=set()
+            newFinalState=set()
+            newNumStates=0
+            newStartState.add(newNumStates)
+            newFinalState.add(newNumStates)
+            newTransitions={'a':[[0]],'b':[[0]],'c':[[0]],'e':[[0]]}
+            newNumStates+=1
+            newFSA=FSA(newNumStates,newStartState,newFinalState,newTransitions)
+            return newFSA
+
         
     # Traverse the regular expression tree(ETree)
     # calling functions on each node and hence
