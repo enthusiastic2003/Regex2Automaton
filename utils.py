@@ -142,30 +142,30 @@ class ETree:
                         markedStates.append((sym,coli)) #Add the marked states and the symbol that marks them to the markedStates list
         
         for symb,state in markedStates:
-            for finals in treeLFinal:
+            for finals in treeLFinal:#For each final state of treeL, we add a transition from the final state of treeL to the marked states
                 tempFSA.alphabetTransitions[symb][finals][state+treeL.numStates]=1
         
-        tempFSA.startStates=treeLStart.copy()
+        tempFSA.startStates=treeLStart.copy()#By default, the start states of the new FSA are the start states of treeL
 
         tempFSA.finalStates=set()
         for state in treeRFinal:
-            tempFSA.finalStates.add(state+treeL.numStates)
+            tempFSA.finalStates.add(state+treeL.numStates)#The final states of the new FSA are the final states of treeR and to each state number of treeRFinal, we add treeL.numStates to it to get the correct state number in the new FSA
 
         for state in treeLStart:
             if state in treeLFinal:
                 for starts in treeRStart:
-                    tempFSA.startStates.add(starts+treeL.numStates)
+                    tempFSA.startStates.add(starts+treeL.numStates)#If the start states of treeL are also final states of treeL, then we add the start states of treeR to the start states of the new FSA
         
         for state in treeRFinal:
             if state in treeRStart:
                 for finals in treeLFinal:
-                    tempFSA.finalStates.add(finals)
+                    tempFSA.finalStates.add(finals)#If the final states of treeR are also start states of treeR, then we add the final states of treeL to the final states of the new FSA
                     
         return tempFSA
 
     # +
     def operatorPlus(self,treeR,treeL):
-        tempFSA=self.resolveTransitionStates(treeL,treeR)
+        tempFSA=self.resolveTransitionStates(treeL,treeR)#resolve the transition states of the two trees, and our resolving function basically does union of the 2 NFAs too.
         return tempFSA
 
 
@@ -173,46 +173,29 @@ class ETree:
 
     # *
     def operatorStar(self,treeLeft):
-        # for sym in treeLeft.alphabetTransitions:
-        #     for row in treeLeft.alphabetTransitions[sym]:
-        #         row.append(0)
-        #     treeLeft.alphabetTransitions[sym].append([0 for i in range(treeLeft.numStates+1)])
         preFinal=[]
-        # postStart=[]
 
-        # for state in treeLeft.startStates:
-        #     for sym in treeLeft.alphabetTransitions:
-        #         for coli in range(len(treeLeft.alphabetTransitions[sym])):
-        #             if(treeLeft.alphabetTransitions[sym][state][coli]==1):
-        #                 postStart.append((sym,coli))
-        
         for state in treeLeft.finalStates:
             for sym in treeLeft.alphabetTransitions:
                 for rowi,row in enumerate(treeLeft.alphabetTransitions[sym]):
                     if(row[state]==1):
-                        preFinal.append((sym,rowi))
+                        preFinal.append((sym,rowi))#Collect all the transitions to the final states of treeLeft and store them in preFinal
 
-        
-        # newStart=treeLeft.numStates
-        # for target in postStart:
-        #     treeLeft.alphabetTransitions[target[0]][newStart][target[1]]=1
 
         for stStates in treeLeft.startStates:
             for target in preFinal:
-                treeLeft.alphabetTransitions[target[0]][target[1]][stStates]=1
+                treeLeft.alphabetTransitions[target[0]][target[1]][stStates]=1#Add transitions to the start states of treeLeft from the preFinal states with the same symbol as the preFinal states
 
-        treeLeft.finalStates=treeLeft.startStates.copy()       
+        treeLeft.finalStates=treeLeft.startStates.copy() #The final states of the new FSA are the start states of the treeLeft      
         
-        # treeLeft.startStates=set()
-        # treeLeft.finalStates=set()
-        # treeLeft.startStates.add(treeLeft.numStates)
-        # treeLeft.finalStates.add(treeLeft.numStates)
-        # treeLeft.numStates+=1     
         return treeLeft
 
             
     # a, b, c and e for epsilon
     def alphabet(self, symbol):
+        """
+        Here, we create an NFA that will accept a single character. We do this by creating a new NFA with 2 states, one start state and one final state, and marking the transition from the start state to the final state with the symbol.
+        """
         if(symbol!='e'):
             newStartState=set()
             newFinalState=set()
@@ -225,6 +208,9 @@ class ETree:
             newFSA=FSA(newNumStates,newStartState,newFinalState,newTransitions)
             return newFSA
         else:
+            """
+            if the symbol is epsilon, then we create an NFA that accepts epsilon. This is done by creating a new NFA with 1 state, and setting that state as the fi8nal and start stae.
+            """
             newStartState=set()
             newFinalState=set()
             newNumStates=0
@@ -252,10 +238,8 @@ class ETree:
         
         if root.val.isalpha():
           retval=self.alphabet(root.val)
-          print("val:",root.val)   
         else:
             symb=root.val
-            print("symb:",symb)
             treeLeft=None
             treeRight=None
             if symb=='*':
@@ -269,7 +253,12 @@ class ETree:
                 else:
                     retval=self.operatorDot(treeLeft,treeRight)
         self.nfa=NFA(retval.numStates,retval.startStates,retval.finalStates,retval.alphabetTransitions)
+        #Print the NFA
+        print("The NFA is as follows:")
+        print("Number of States: ",self.nfa.numStates)
+        print("Start States: ",self.nfa.startStates)
+        print("Final States: ",self.nfa.finalStates)
+        print("Alphabet Transitions: ",self.nfa.alphabetTransitions)
         return self.nfa           
-        # print NFA
 
     ######################################################################
