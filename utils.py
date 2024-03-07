@@ -1,5 +1,4 @@
 import abc
-import numpy as np
 # this class characterizes an automaton
 class FSA:
     def __init__ (self, numStates = 0, startStates=None, finalStates=None, alphabetTransitions=None) :
@@ -232,7 +231,7 @@ class ETree:
     #Anytime we work on a binary tree, the first thing that comes to mind is recursion. So thats what we will do.
          
 
-    def buildNFA(self, root):
+    def buildNFAR(self, root):
 
         # write code to populate the above datastructures for a regex tree
         
@@ -243,22 +242,30 @@ class ETree:
             treeLeft=None
             treeRight=None
             if symb=='*':
-                treeLeft=self.buildNFA(root.left)
+                treeLeft=self.buildNFAR(root.left)
                 retval=self.operatorStar(treeLeft)
             else:
-                treeLeft=self.buildNFA(root.left)
-                treeRight=self.buildNFA(root.right)
+                treeLeft=self.buildNFAR(root.left)
+                treeRight=self.buildNFAR(root.right)
                 if symb=='+':
                     retval=self.operatorPlus(treeLeft,treeRight)
                 else:
                     retval=self.operatorDot(treeLeft,treeRight)
         self.nfa=NFA(retval.numStates,retval.startStates,retval.finalStates,retval.alphabetTransitions)
         #Print the NFA
+
+        return self.nfa           
+
+    def buildNFA(self,root):
+        gotRet=self.buildNFAR(root)
+
+        self.nfa=gotRet
         print("The NFA is as follows:")
         print("Number of States: ",self.nfa.numStates)
         print("Start States: ",self.nfa.startStates)
         print("Final States: ",self.nfa.finalStates)
         print("Alphabet Transitions: ",self.nfa.alphabetTransitions)
-        return self.nfa           
 
+        return self.nfa
+        
     ######################################################################
